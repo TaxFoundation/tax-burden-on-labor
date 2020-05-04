@@ -119,11 +119,11 @@ oecd_countries<-c("AUS",
 iso_codes <- read.csv("source-data/iso_country_codes.csv")
 colnames(iso_codes)<-c("Label","ISO2","Country")
 
-#Table 1: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2018####
+#Table 1: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2019####
 #144 Average tax wedge (% labour costs); 1441 Income tax as % of labour costs; 1442   Employee SSC as % of labour costs;1443 Average rate of employer's social security contributions (% gross wage earnings)###
 
-data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2018)
-data_labourcost<-get_dataset("AWCOMP",filter= list(c("5_2","5_3"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2018)
+data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2019)
+data_labourcost<-get_dataset("AWCOMP",filter= list(c("5_2","5_3"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2019)
 
 data <- rbind (data, data_labourcost)
 
@@ -158,7 +158,7 @@ colnames(table1)[colnames(table1)=="Label"] <- "Country"
 write.csv(table1,"final-outputs/Table1.csv",row.names = F)
 
 
-#Table 2: Tax Wedge Including VAT of a Single Worker with no Children Earning a Nation's Average Wage, 2018####
+#Table 2: Tax Wedge Including VAT of a Single Worker with no Children Earning a Nation's Average Wage, 2019####
 table2 <- spread (data, key = INDICATOR, value = obsValue)
 
 #Read in VAT file
@@ -198,7 +198,7 @@ colnames(table2)[colnames(table2)=="Label"] <- "Country"
 
 write.csv(table2,"final-outputs/Table2.csv",row.names = F)
 
-#Figure 1 Average OECD Tax Burden. OECD  Average of the Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2018####
+#Figure 1 Average OECD Tax Burden. OECD  Average of the Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2019####
 
 Figure1_data <- table1
 Figure1_data <- subset.data.frame (Figure1_data, Figure1_data$"Country" =="OECD Average")
@@ -235,9 +235,9 @@ colnames(Figure2)[colnames(Figure2)=="Label"] <- "Country"
 
 write.csv(Figure2, "final-outputs/Figure2.csv",row.names = F)
 
-#Figure 3  Tax Burden of Singles vs. Families. Tax Wedges at a Nation's Average Wage, 2018####
+#Figure 3  Tax Burden of Singles vs. Families. Tax Wedges at a Nation's Average Wage, 2019####
 
-Figure3<-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2","MARRIED1")),start_time = 2018)
+Figure3<-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2","MARRIED1")),start_time = 2019)
 
 #Drop redundant columns
 Figure3 <- subset(Figure3, select=-c(INDICATOR, TIME_FORMAT, UNIT, POWERCODE, obsTime))
@@ -259,7 +259,7 @@ colnames(Figure3)[colnames(Figure3)=="Label"] <- "Country"
 
 write.csv(Figure3, "final-outputs/Figure3.csv",row.names = F)
 
-#Figure 4 OECD Average Tax Burden, 2000-2018. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage####
+#Figure 4 OECD Average Tax Burden, 2000-2019. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage####
 Figure4<-get_dataset ("AWCOU",filter= list(c("144"),c("SINGLE2"), c("OAVG")), start_time = 2000)
 
 #Drop redundant columns
@@ -272,9 +272,9 @@ colnames(Figure4)[colnames(Figure4)=="obsValue"] <- "OECD Average"
 write.csv(Figure4, "final-outputs/Figure4.csv",row.names = F)
 
 
-#Figure 5 Most Notable Changes in the Tax Wedge between 2000 and 2018####
+#Figure 5 Most Notable Changes in the Tax Wedge between 2000 and 2019####
 
-Figure5 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2018)
+Figure5 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2019)
 
 Figure5_2000 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2000, end_time = 2000)
 
@@ -287,8 +287,8 @@ Figure5 <- subset(Figure5, select=-c(INDICATOR, FAM_TYPE, TIME_FORMAT, UNIT, POW
 #Put data into columns
 Figure5 <- spread (Figure5, key = obsTime, value = obsValue)
 
-#Determine the 6 countries with the Most Notable Changes in the Tax Wedge between 2000 and 2018
-Figure5$dif <- Figure5$'2018'- Figure5$'2000'
+#Determine the 6 countries with the Most Notable Changes in the Tax Wedge between 2000 and 2019
+Figure5$dif <- Figure5$'2019'- Figure5$'2000'
 Figure5$abs <- abs(Figure5$dif)
 Figure5$Rank <- rank (Figure5$abs)
 Figure5 <- subset(Figure5, Figure5$Rank > 30)
@@ -298,9 +298,9 @@ Figure5 <- subset (Figure5, select=-c(2,3,abs, Rank))
 
 #Rename columns
 colnames(Figure5)[colnames(Figure5)=="COU"] <- "Country"
-colnames(Figure5)[colnames(Figure5)=="dif"] <- "Change in Tax Wedge between 2000 and 2018"
+colnames(Figure5)[colnames(Figure5)=="dif"] <- "Change in Tax Wedge between 2000 and 2019"
 
-Figure5 [order(Figure5$"Change in Tax Wedge between 2000 and 2018"),]
+Figure5 [order(Figure5$"Change in Tax Wedge between 2000 and 2019"),]
 
 Figure5<-merge(iso_codes,Figure5,by=c("Country"))
 Figure5<-Figure5[,-c(1,3)]
@@ -309,7 +309,7 @@ colnames(Figure5)[colnames(Figure5)=="Label"] <- "Country"
 write.csv(Figure5, "final-outputs/Figure5.csv",row.names = F)
 
 
-#Figure 6 Economic Cost for the Marginal Dollar of Revenue Collected from Labor. Ratio of Marginal Tax Wedge to Average Tax Wedge, 2018####
+#Figure 6 Economic Cost for the Marginal Dollar of Revenue Collected from Labor. Ratio of Marginal Tax Wedge to Average Tax Wedge, 2019####
 #martax_wedge
 #Table_I4#
 #dataset<-("Table_I4")
@@ -319,30 +319,30 @@ write.csv(Figure5, "final-outputs/Figure5.csv",row.names = F)
 #dstruc$INCOMEAW
 #dstruc$CL_TABLE_I4_MARGRATES
 
-martax_wedge<-get_dataset("Table_I4",filter= list(c(oecd_countries),c("67","100","133","167"),c("TOT_TAX_WEDGE")), start_time = 2018)
+martax_wedge<-get_dataset("Table_I4",filter= list(c(oecd_countries),c("67","100","133","167"),c("TOT_TAX_WEDGE")), start_time = 2019)
 
-#martax_wedge<-get_dataset("Table_I4",filter= list(c("67","100","133","167"),c("TOT_TAX_WEDGE")), start_time = 2018)
+#martax_wedge<-get_dataset("Table_I4",filter= list(c("67","100","133","167"),c("TOT_TAX_WEDGE")), start_time = 2019)
 
 
 martax_wedge<-martax_wedge[c(1,2,5,6)]
 colnames(martax_wedge)<-c("Country","Income","Year","martax_wedge")
 martax_wedge<-spread(martax_wedge,Year,martax_wedge)
 
-OAVG_67<-mean(subset(martax_wedge$`2018`,martax_wedge$Income==67))
-OAVG_100<-mean(subset(martax_wedge$`2018`,martax_wedge$Income==100))
-OAVG_133<-mean(subset(martax_wedge$`2018`,martax_wedge$Income==133))
-OAVG_167<-mean(subset(martax_wedge$`2018`,martax_wedge$Income==167))
+OAVG_67<-mean(subset(martax_wedge$`2019`,martax_wedge$Income==67))
+OAVG_100<-mean(subset(martax_wedge$`2019`,martax_wedge$Income==100))
+OAVG_133<-mean(subset(martax_wedge$`2019`,martax_wedge$Income==133))
+OAVG_167<-mean(subset(martax_wedge$`2019`,martax_wedge$Income==167))
 
 Country<-c("OAVG","OAVG","OAVG","OAVG")
 Income<-c("67","100","133","167")
 Value<-c(OAVG_67,OAVG_100,OAVG_133,OAVG_167)
 
 OAVG<-data.frame(Country,Income,Value)
-colnames(OAVG)<-c("Country","Income","2018")
+colnames(OAVG)<-c("Country","Income","2019")
 
 martax_wedge<-rbind(martax_wedge,OAVG)
 
-martax_wedge2018<-aggregate(martax_wedge$`2018`,by=list(martax_wedge$Country),FUN=mean)
+martax_wedge2019<-aggregate(martax_wedge$`2019`,by=list(martax_wedge$Country),FUN=mean)
 
 
 #avgtax_wedge
@@ -354,34 +354,34 @@ martax_wedge2018<-aggregate(martax_wedge$`2018`,by=list(martax_wedge$Country),FU
 #dstruc$INCOMEAW
 #dstruc$CL_TABLE_I4_MARGRATES
 
-avgtax_wedge<-get_dataset("Table_I5",filter= list(c(oecd_countries),c("67","100","133","167"),c("TOT_TAX_WEDGE")), start_time = 2018)
+avgtax_wedge<-get_dataset("Table_I5",filter= list(c(oecd_countries),c("67","100","133","167"),c("TOT_TAX_WEDGE")), start_time = 2019)
 
 avgtax_wedge<-avgtax_wedge[c(1,2,5,6)]
 colnames(avgtax_wedge)<-c("Country","Income","Year","avgtax_wedge")
 avgtax_wedge<-spread(avgtax_wedge,Year,avgtax_wedge)
 
-OAVG_67<-mean(subset(avgtax_wedge$`2018`,avgtax_wedge$Income==67))
-OAVG_100<-mean(subset(avgtax_wedge$`2018`,avgtax_wedge$Income==100))
-OAVG_133<-mean(subset(avgtax_wedge$`2018`,avgtax_wedge$Income==133))
-OAVG_167<-mean(subset(avgtax_wedge$`2018`,avgtax_wedge$Income==167))
+OAVG_67<-mean(subset(avgtax_wedge$`2019`,avgtax_wedge$Income==67))
+OAVG_100<-mean(subset(avgtax_wedge$`2019`,avgtax_wedge$Income==100))
+OAVG_133<-mean(subset(avgtax_wedge$`2019`,avgtax_wedge$Income==133))
+OAVG_167<-mean(subset(avgtax_wedge$`2019`,avgtax_wedge$Income==167))
 
 Country<-c("OAVG","OAVG","OAVG","OAVG")
 Income<-c("67","100","133","167")
 Value<-c(OAVG_67,OAVG_100,OAVG_133,OAVG_167)
 
 OAVG<-data.frame(Country,Income,Value)
-colnames(OAVG)<-c("Country","Income","2018")
+colnames(OAVG)<-c("Country","Income","2019")
 
 avgtax_wedge<-rbind(avgtax_wedge,OAVG)
 
 
-avgtax_wedge2018<-aggregate(avgtax_wedge$`2018`,by=list(avgtax_wedge$Country),FUN=mean)
+avgtax_wedge2019<-aggregate(avgtax_wedge$`2019`,by=list(avgtax_wedge$Country),FUN=mean)
 
-countries<-avgtax_wedge2018$Group.1
+countries<-avgtax_wedge2019$Group.1
 
-tax_wedge2018<-martax_wedge2018$x/avgtax_wedge2018$x
+tax_wedge2019<-martax_wedge2019$x/avgtax_wedge2019$x
 
-Figure6<-data.frame(countries,tax_wedge2018)
+Figure6<-data.frame(countries,tax_wedge2019)
 
 colnames(Figure6)<-c("Country","Marginal to Average Tax Wedge Ratio")
 Figure6<-merge(iso_codes,Figure6,by=c("Country"))
@@ -389,7 +389,7 @@ Figure6<-Figure6[,-c(1,3)]
 colnames(Figure6)[colnames(Figure6)=="Label"] <- "Country"
 
 write.csv(Figure6,"final-outputs/Figure6.csv",row.names = F)
-#Figure 7 Tax Burden Accounting for VAT in OECD Countries. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2018####
+#Figure 7 Tax Burden Accounting for VAT in OECD Countries. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2019####
 Figure7 <- Figure7 [c ("COU", 144, "Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)")]
 
 #Rename columns
@@ -403,3 +403,4 @@ Figure7<-Figure7[,-c(1,3)]
 colnames(Figure7)[colnames(Figure7)=="Label"] <- "Country"
 
 write.csv(Figure7, "final-outputs/Figure7.csv",row.names = F)
+
