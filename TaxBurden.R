@@ -146,14 +146,15 @@ table1 [order(-table1$Rank),]
 
 #Rename columns
 colnames(table1)[colnames(table1)=="COU"] <- "Country"
-colnames(table1)[colnames(table1)=="144"] <- "Tax Wedge in % (As a Share of Labor Cost)"
-colnames(table1)[colnames(table1)=="1441"] <- "Income Tax in %"
-colnames(table1)[colnames(table1)=="1442"] <- "Employee Payroll Taxes in %"
-colnames(table1)[colnames(table1)=="1443"] <- "Employer Payroll Taxes in %"
+colnames(table1)[colnames(table1)=="144"] <- "Tax Wedge in percentage (As a Share of Labor Cost)"
+colnames(table1)[colnames(table1)=="1441"] <- "Income Tax in percentage"
+colnames(table1)[colnames(table1)=="1442"] <- "Employee Payroll Taxes in percentage"
+colnames(table1)[colnames(table1)=="1443"] <- "Employer Payroll Taxes in percentage"
 colnames(table1)[colnames(table1)=="5_3"] <- "Total Average Annual Labor Cost per Employee in $"
 
 table1<-merge(iso_codes,table1,by=c("Country"))
-table1<-table1[,-c(1,3)]
+#table1<-table1[,-c(1,3)]
+colnames(table1)[colnames(table1)=="Country"] <- "ISO3"
 colnames(table1)[colnames(table1)=="Label"] <- "Country"
 write.csv(table1,"final-outputs/Table1.csv",row.names = F)
 
