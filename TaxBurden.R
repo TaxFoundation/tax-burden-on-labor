@@ -208,10 +208,10 @@ print(colnames(Figure1_data))
 #table2["30", "Rank"] <- "NA"
 
 variable<-c("After-Tax Income","Income Tax", "Employee Payroll Taxes", "Employer Payroll Taxes","Pre-tax")
-percent<-c(100-Figure1_data["30","Tax Wedge in % (As a Share of Labor Cost)"],
-           Figure1_data["30","Income Tax in %"],
-           Figure1_data["30","Employee Payroll Taxes in %"],
-           Figure1_data["30","Employer Payroll Taxes in %"],
+percent<-c(100-Figure1_data["30","Tax Wedge in percentage (As a Share of Labor Cost)"],
+           Figure1_data["30","Income Tax in percentage"],
+           Figure1_data["30","Employee Payroll Taxes in percentage"],
+           Figure1_data["30","Employer Payroll Taxes in percentage"],
            100)
 Figure1<-data.frame(variable,percent)
 Figure1$dollar<-Figure1$percent/100*Figure1_data["30","Total Average Annual Labor Cost per Employee in $"]
