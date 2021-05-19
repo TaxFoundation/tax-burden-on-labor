@@ -146,14 +146,15 @@ table1 [order(-table1$Rank),]
 
 #Rename columns
 colnames(table1)[colnames(table1)=="COU"] <- "Country"
-colnames(table1)[colnames(table1)=="144"] <- "Tax Wedge in % (As a Share of Labor Cost)"
-colnames(table1)[colnames(table1)=="1441"] <- "Income Tax in %"
-colnames(table1)[colnames(table1)=="1442"] <- "Employee Payroll Taxes in %"
-colnames(table1)[colnames(table1)=="1443"] <- "Employer Payroll Taxes in %"
+colnames(table1)[colnames(table1)=="144"] <- "Tax Wedge in percentage (As a Share of Labor Cost)"
+colnames(table1)[colnames(table1)=="1441"] <- "Income Tax in percentage"
+colnames(table1)[colnames(table1)=="1442"] <- "Employee Payroll Taxes in percentage"
+colnames(table1)[colnames(table1)=="1443"] <- "Employer Payroll Taxes in percentage"
 colnames(table1)[colnames(table1)=="5_3"] <- "Total Average Annual Labor Cost per Employee in $"
 
 table1<-merge(iso_codes,table1,by=c("Country"))
-table1<-table1[,-c(1,3)]
+#table1<-table1[,-c(1,3)]
+colnames(table1)[colnames(table1)=="Country"] <- "ISO3"
 colnames(table1)[colnames(table1)=="Label"] <- "Country"
 write.csv(table1,"final-outputs/Table1.csv",row.names = F)
 
@@ -207,10 +208,10 @@ print(colnames(Figure1_data))
 #table2["30", "Rank"] <- "NA"
 
 variable<-c("After-Tax Income","Income Tax", "Employee Payroll Taxes", "Employer Payroll Taxes","Pre-tax")
-percent<-c(100-Figure1_data["30","Tax Wedge in % (As a Share of Labor Cost)"],
-           Figure1_data["30","Income Tax in %"],
-           Figure1_data["30","Employee Payroll Taxes in %"],
-           Figure1_data["30","Employer Payroll Taxes in %"],
+percent<-c(100-Figure1_data["30","Tax Wedge in percentage (As a Share of Labor Cost)"],
+           Figure1_data["30","Income Tax in percentage"],
+           Figure1_data["30","Employee Payroll Taxes in percentage"],
+           Figure1_data["30","Employer Payroll Taxes in percentage"],
            100)
 Figure1<-data.frame(variable,percent)
 Figure1$dollar<-Figure1$percent/100*Figure1_data["30","Total Average Annual Labor Cost per Employee in $"]
