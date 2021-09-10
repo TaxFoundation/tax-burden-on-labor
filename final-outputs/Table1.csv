@@ -1,4 +1,4 @@
-"ISO3","Country","ISO2","Rank","Tax Wedge in percentage (As a Share of Labor Cost)","Income Tax in percentage","Employee Payroll Taxes in percentage","Employer Payroll Taxes in percentage","Total Average Annual Labor Cost per Employee in $"
+"ISO3","Country","ISO2","Rank","Tax Wedge in % (As a Share of Labor Cost)","Income Tax in %","Employee Payroll Taxes in %","Employer Payroll Taxes in %","Total Average Annual Labor Cost per Employee in $"
 "AUS","Australia","AU",30,27.945726,22.31406,0,5.631666,63242.070502
 "AUT","Austria","AT",4,47.908305,11.884416,14.021795,22.002095,81033.553368
 "BEL","Belgium","BE",1,52.242228,19.914672,10.990289,21.337266,82002.401389
