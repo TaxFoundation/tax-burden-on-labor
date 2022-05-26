@@ -49,6 +49,7 @@ oecd_countries<-c("AUS",
                   "COL",
                   "CAN",
                   "CHL",
+                  "CRI",
                   "CZE",
                   "DNK",
                   "EST",
@@ -83,13 +84,13 @@ oecd_countries<-c("AUS",
 
 #Reading in and cleaning OECD's Taxing Wages dataset###
 
-dataset_list<-get_datasets()
-data<-search_dataset("Tax wages", data= dataset_list)
-dataset<-("AWCOMP")
+#dataset_list<-get_datasets()
+#data<-search_dataset("Tax wages", data= dataset_list)
+#dataset<-("AWCOMP")
 #AWCOMP is Taxing wages _ comparative tables#
-dstruc<-get_data_structure(dataset)
-str(dstruc, max.level = 1)
-dstruc$INDICATOR
+#dstruc<-get_data_structure(dataset)
+#str(dstruc, max.level = 1)
+#dstruc$INDICATOR
 #dstruc$FAM_TYPE
 #dstruc$COU
 #dstruc$VAR_DESC
@@ -117,102 +118,104 @@ colnames(iso_codes)<-c("Label","ISO2","Country")
 #Table 2: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2020####
 #144 Average tax wedge (% labour costs); 1441 Income tax as % of labour costs; 1442   Employee SSC as % of labour costs;1443 Average rate of employer's social security contributions (% gross wage earnings)###
 
-data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2020)
-data_labourcost<-get_dataset("AWCOMP",filter= list(c("5_1","5_2","5_3"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2020)
+data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2021)
+data_labourcost<-get_dataset("AWCOMP",filter= list(c("5_1","5_2","5_3"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2021)
 
 #Save Gross Earnings in USDPP for MTW
 Gross_Earnings_USDPP <-  subset(data_labourcost, INDICATOR == "5_1")
-Gross_Earnings_USDPP <-  subset(Gross_Earnings_USDPP, select=-c(TIME_FORMAT, UNIT, POWERCODE, obsTime, FAM_TYPE, INDICATOR))
-colnames(Gross_Earnings_USDPP)[colnames(Gross_Earnings_USDPP)=="obsValue"] <- "Gross_USDPP"
+Gross_Earnings_USDPP <-  subset(Gross_Earnings_USDPP, select=-c(TIME_FORMAT, UNIT, POWERCODE, Time, FAM_TYPE, INDICATOR))
+colnames(Gross_Earnings_USDPP)[colnames(Gross_Earnings_USDPP)=="ObsValue"] <- "Gross_USDPP"
 data <- rbind (data, data_labourcost)
 
 #Drop redundant columns
-data <- subset(data, select=-c(TIME_FORMAT, UNIT, POWERCODE, obsTime, FAM_TYPE))
+data <- subset(data, select=-c(TIME_FORMAT, UNIT, POWERCODE, Time, FAM_TYPE))
 
 #Put data into columns, add a rank column, order the data and rearrange the columns
-table2 <- spread (data, key = INDICATOR, value = obsValue)
-table2$Rank <- rank(100-table2$`144`)
+data$ObsValue<-as.numeric(data$ObsValue)
+
+table1 <- spread(data, INDICATOR, ObsValue)
+table1$Rank <- rank(100-table1$`144`)
 #Double check that OAVG is ranked 24th
-table2$Rank<-if_else(table2$Rank>24,table2$Rank-1,table2$Rank)
+table1$Rank<-if_else(table1$Rank>24,table1$Rank-1,table1$Rank)
 
-#Double check that OAVG is on row 31
-table2["31", "Rank"] <- "NA"
-table2$Rank<-as.numeric(table2$Rank)
+#Double check that OAVG is on row 32
+table1["32", "Rank"] <- 39
+table1$Rank<-as.numeric(table1$Rank)
 
-table2 <- table2[c ("COU","Rank", 144, 1441, 1442, 1443, "5_3")]
+table1 <- table1[c ("COU","Rank", 144, 1441, 1442, 1443, "5_3")]
 
-table2 [order(-table2$Rank),]
+table1 [order(-table1$Rank),]
 
 #Rename columns
-colnames(table2)[colnames(table2)=="COU"] <- "Country"
-colnames(table2)[colnames(table2)=="144"] <- "Tax Wedge in percentage (As a Share of Labor Cost)"
-colnames(table2)[colnames(table2)=="1441"] <- "Income Tax in percentage"
-colnames(table2)[colnames(table2)=="1442"] <- "Employee Payroll Taxes in percentage"
-colnames(table2)[colnames(table2)=="1443"] <- "Employer Payroll Taxes in percentage"
-colnames(table2)[colnames(table2)=="5_3"] <- "Total Average Annual Labor Cost per Employee in $"
+colnames(table1)[colnames(table1)=="COU"] <- "Country"
+colnames(table1)[colnames(table1)=="144"] <- "Tax Wedge in % (As a Share of Labor Cost)"
+colnames(table1)[colnames(table1)=="1441"] <- "Income Tax in %"
+colnames(table1)[colnames(table1)=="1442"] <- "Employee Payroll Taxes in %"
+colnames(table1)[colnames(table1)=="1443"] <- "Employer Payroll Taxes in %"
+colnames(table1)[colnames(table1)=="5_3"] <- "Total Average Annual Labor Cost per Employee in $"
 
-table2<-merge(iso_codes,table2,by=c("Country"))
-#table2<-table2[,-c(1,3)]
-colnames(table2)[colnames(table2)=="Country"] <- "ISO3"
-colnames(table2)[colnames(table2)=="Label"] <- "Country"
-write.csv(table2,"final-outputs/table2.csv",row.names = F)
+table1<-merge(iso_codes,table1,by=c("Country"))
+#table1<-table1[,-c(1,3)]
+colnames(table1)[colnames(table1)=="Country"] <- "ISO3"
+colnames(table1)[colnames(table1)=="Label"] <- "Country"
+write.csv(table1,"final-outputs/table1.csv",row.names = F)
 
 
 #Table 3: Tax Wedge Including VAT of a Single Worker with no Children Earning a Nation's Average Wage, 2020####
-table3 <- spread (data, key = INDICATOR, value = obsValue)
+table2 <- spread (data, key = INDICATOR, value = ObsValue)
 
 #Read in VAT file
 VAT_data <- read.csv("source-data/VAT_data.csv")
 
 #MERGE VAT file and table 3
-table3<- merge(table3, VAT_data, by='COU')
+table2<- merge(table2, VAT_data, by='COU')
 
-table3$"1441_USD"<-table3$"1441"/100*table3$"5_3"
-table3$"1442_USD"<-table3$"1442"/100*table3$"5_3"
-table3$"1443_USD"<-table3$"1443"/100*table3$"5_3"
-table3$"VAT_effective_%"<-table3$"VAT_rate"/(100+table3$"VAT_rate")*table3$"VRR"
-table3$"VAT_amount"<-table3$"VAT_effective"/100*table3$"5_3"
-table3$"Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)"<- (table3$"1441_USD"+table3$"1442_USD"+ table3$"1443_USD"+table3$"VAT_amount")/(table3$"5_3"+table3$"VAT_amount")
-table3$"Total Average Annual Labor Cost per Employee Including VAT in $" <-(table3$"VAT_amount"+table3$"5_3")
-table3$"Income Tax in % (As Share of Labor Cost Including VAT)" <- table3$"1441_USD"/table3$"Total Average Annual Labor Cost per Employee Including VAT in $"
-table3$"Employee and Employer Payroll Taxes in % (As Share of Labor Costs Including VAT)" <- (table3$"1442_USD"+ table3$"1443_USD")/table3$"Total Average Annual Labor Cost per Employee Including VAT in $"
-table3$"VAT in % (As Share of Labor Costs Including VAT)" <- table3$VAT_amount/table3$"Total Average Annual Labor Cost per Employee Including VAT in $"
-table3$Rank <- rank (100-table3$"Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)")
+table2$"1441_USD"<-table2$"1441"/100*table2$"5_3"
+table2$"1442_USD"<-table2$"1442"/100*table2$"5_3"
+table2$"1443_USD"<-table2$"1443"/100*table2$"5_3"
+table2$"VAT_effective_%"<-table2$"VAT_rate"/(100+table2$"VAT_rate")*table2$"VRR"
+table2$"VAT_amount"<-table2$"VAT_effective"/100*table2$"5_3"
+table2$"Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)"<- (table2$"1441_USD"+table2$"1442_USD"+ table2$"1443_USD"+table2$"VAT_amount")/(table2$"5_3"+table2$"VAT_amount")
+table2$"Total Average Annual Labor Cost per Employee Including VAT in $" <-(table2$"VAT_amount"+table2$"5_3")
+table2$"Income Tax in % (As Share of Labor Cost Including VAT)" <- table2$"1441_USD"/table2$"Total Average Annual Labor Cost per Employee Including VAT in $"
+table2$"Employee and Employer Payroll Taxes in % (As Share of Labor Costs Including VAT)" <- (table2$"1442_USD"+ table2$"1443_USD")/table2$"Total Average Annual Labor Cost per Employee Including VAT in $"
+table2$"VAT in % (As Share of Labor Costs Including VAT)" <- table2$VAT_amount/table2$"Total Average Annual Labor Cost per Employee Including VAT in $"
+table2$Rank <- rank (100-table2$"Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)")
 #Double check that OAVG is ranked 24rd
-table3$Rank<-if_else(table3$Rank>24,table3$Rank-1,table3$Rank)
+table2$Rank<-if_else(table2$Rank>24,table2$Rank-1,table2$Rank)
 
-#Double check that OAVG is on row 31
-table3["31", "Rank"] <- "NA"
+#Double check that OAVG is on row 32
+table2["32", "Rank"] <- "NA"
 
 #Saving data from table 3 to use it in Figure 6
-figure6 <- table3
+figure6 <- table2
 
-table3 <- table3[c ("COU","Rank", "Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)", "Income Tax in % (As Share of Labor Cost Including VAT)", "Employee and Employer Payroll Taxes in % (As Share of Labor Costs Including VAT)","VAT in % (As Share of Labor Costs Including VAT)", "Total Average Annual Labor Cost per Employee Including VAT in $")]
-table3$Rank<-as.numeric(table3$Rank)
+table2 <- table2[c ("COU","Rank", "Tax Wedge Including VAT in % (As Share of Labor Cost and VAT)", "Income Tax in % (As Share of Labor Cost Including VAT)", "Employee and Employer Payroll Taxes in % (As Share of Labor Costs Including VAT)","VAT in % (As Share of Labor Costs Including VAT)", "Total Average Annual Labor Cost per Employee Including VAT in $")]
+table2$Rank<-as.numeric(table2$Rank)
 #Rename columns
-colnames(table3)[colnames(table3)=="COU"] <- "Country"
-table3<-merge(iso_codes,table3,by=c("Country"))
-table3<-table3[,-c(1,3)]
-colnames(table3)[colnames(table3)=="Label"] <- "Country"
+colnames(table2)[colnames(table2)=="COU"] <- "Country"
+table2<-merge(iso_codes,table2,by=c("Country"))
+table2<-table2[,-c(1,3)]
+colnames(table2)[colnames(table2)=="Label"] <- "Country"
 
 
-write.csv(table3,"final-outputs/Table3.csv",row.names = F)
+write.csv(table2,"final-outputs/table2.csv",row.names = F)
 
 #Figure 1 Average OECD Tax Burden. OECD  Average of the Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2020####
 
-Figure1_data <- table2
+Figure1_data <- table1
 Figure1_data <- subset.data.frame (Figure1_data, Figure1_data$"Country" =="OECD Average")
 
 print(colnames(Figure1_data))
 
 variable<-c("After-Tax Income","Income Tax", "Employee Payroll Taxes", "Employer Payroll Taxes","Pre-tax")
-percent<-c(100-Figure1_data["31","Tax Wedge in percentage (As a Share of Labor Cost)"],
-           Figure1_data["31","Income Tax in percentage"],
-           Figure1_data["31","Employee Payroll Taxes in percentage"],
-           Figure1_data["31","Employer Payroll Taxes in percentage"],
+percent<-c(100-Figure1_data["32","Tax Wedge in % (As a Share of Labor Cost)"],
+           Figure1_data["32","Income Tax in %"],
+           Figure1_data["32","Employee Payroll Taxes in %"],
+           Figure1_data["32","Employer Payroll Taxes in %"],
            100)
 Figure1<-data.frame(variable,percent)
-Figure1$dollar<-Figure1$percent/100*Figure1_data["31","Total Average Annual Labor Cost per Employee in $"]
+Figure1$dollar<-Figure1$percent/100*Figure1_data["32","Total Average Annual Labor Cost per Employee in $"]
 
 write.csv(Figure1,"final-outputs/Figure1.csv",row.names = F)
 
@@ -225,7 +228,7 @@ Figure2 <- subset (Figure2, select=-c(INDICATOR))
 
 #Rename columns
 colnames(Figure2)[colnames(Figure2)=="COU"] <- "Country"
-colnames(Figure2)[colnames(Figure2)=="obsValue"] <- "Tax Wedge in %"
+colnames(Figure2)[colnames(Figure2)=="ObsValue"] <- "Tax Wedge in %"
 Figure2 [order(-Figure2$"Tax Wedge in %"),]
 
 Figure2<-merge(iso_codes,Figure2,by=c("Country"))
@@ -234,16 +237,16 @@ colnames(Figure2)[colnames(Figure2)=="Label"] <- "Country"
 
 write.csv(Figure2, "final-outputs/Figure2.csv",row.names = F)
 
-#Figure 3  Tax Burden of Singles vs. Families. Tax Wedges at a Nation's Average Wage, 2020####
+#Figure 3  Tax Burden of Singles vs. Families. Tax Wedges at a Nation's Average Wage, 2021####
 
-Figure3<-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2","MARRIED1")),start_time = 2020)
+Figure3<-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2","MARRIED1")),start_time = 2021)
 
 #Drop redundant columns
-Figure3 <- subset(Figure3, select=-c(INDICATOR, TIME_FORMAT, UNIT, POWERCODE, obsTime))
+Figure3 <- subset(Figure3, select=-c(INDICATOR, TIME_FORMAT, UNIT, POWERCODE, Time))
 
 #Put data into columns
 
-Figure3 <- spread (Figure3, key = FAM_TYPE, value = obsValue)
+Figure3 <- spread (Figure3, key = FAM_TYPE, value = ObsValue)
 Figure3 <-Figure3 [c ("COU","SINGLE2","MARRIED1")]
 
 #Rename columns
@@ -264,15 +267,15 @@ Figure4<-get_dataset ("AWCOU",filter= list(c("144"),c("SINGLE2"), c("OAVG")), st
 Figure4 <- subset(Figure4, select=-c(INDICATOR, FAM_TYPE, COU, TIME_FORMAT, POWERCODE))
 
 #Rename columns
-colnames(Figure4)[colnames(Figure4)=="obsTime"] <- "Year"
-colnames(Figure4)[colnames(Figure4)=="obsValue"] <- "OECD Average"
+colnames(Figure4)[colnames(Figure4)=="Time"] <- "Year"
+colnames(Figure4)[colnames(Figure4)=="ObsValue"] <- "OECD Average"
 
 write.csv(Figure4, "final-outputs/Figure4.csv",row.names = F)
 
 
 #Figure 5 Most Notable Changes in the Tax Wedge between 2000 and 2020####
 
-Figure5 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2020)
+Figure5 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2021)
 
 Figure5_2000 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2000, end_time = 2000)
 
@@ -284,22 +287,25 @@ Figure5 <- subset(Figure5, select=-c(INDICATOR, FAM_TYPE, TIME_FORMAT, UNIT, POW
 
 
 #Put data into columns
-Figure5 <- spread (Figure5, key = obsTime, value = obsValue)
+Figure5 <- spread (Figure5, key = Time, value = ObsValue)
 
 #Determine the 6 countries with the Most Notable Changes in the Tax Wedge between 2000 and 2020
-Figure5$dif <- Figure5$'2020'- Figure5$'2000'
+Figure5$`2000`<-as.numeric(Figure5$`2000`)
+Figure5$`2021`<-as.numeric(Figure5$`2021`)
+
+Figure5$dif <- Figure5$'2021'- Figure5$'2000'
 Figure5$abs <- abs(Figure5$dif)
 Figure5$Rank <- rank (Figure5$abs)
-Figure5 <- subset(Figure5, Figure5$Rank > 31)
+Figure5 <- subset(Figure5, Figure5$Rank > 32)
 
 #Drop redundant columns
 Figure5 <- subset (Figure5, select=-c(2,3,abs, Rank))
 
 #Rename columns
 colnames(Figure5)[colnames(Figure5)=="COU"] <- "Country"
-colnames(Figure5)[colnames(Figure5)=="dif"] <- "Change in Tax Wedge between 2000 and 2020"
+colnames(Figure5)[colnames(Figure5)=="dif"] <- "Change in Tax Wedge between 2000 and 2021"
 
-Figure5 [order(Figure5$"Change in Tax Wedge between 2000 and 2020"),]
+Figure5 [order(Figure5$"Change in Tax Wedge between 2000 and 2021"),]
 
 Figure5<-merge(iso_codes,Figure5,by=c("Country"))
 Figure5<-Figure5[,-c(1,3)]
@@ -420,12 +426,13 @@ write.csv(figure6, "final-outputs/figure6.csv",row.names = F)
 
 
 #Marginal Tax Wedges for country profile page charts####
-data_MTW <-get_dataset("TXWDECOMP",filter= list(c(oecd_countries, "OAVG"),c("MRG_TX_WEDGE"),c("SGL"), c("50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150")),start_time = 2020 )
-table_MTW <- data_MTW[c(1,4,7)]
+data_MTW <-get_dataset("TXWDECOMP",filter= list(c(oecd_countries, "OAVG"),c("MRG_TX_WEDGE"),c("SGL"), c("50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150")),start_time = 2021)
+table_MTW <- data_MTW[c(1,2,5)]
 
 #Merge MTW with Average Gross Earnings in USDPP
 table_MTW <- merge(table_MTW,Gross_Earnings_USDPP,by=c("COU"))
 table_MTW$ER<-as.numeric(table_MTW$ER)
+table_MTW$"Gross_USDPP"<-as.numeric(table_MTW$"Gross_USDPP")
 
 #Calculate Gross Earnings for each percentile
 table_MTW$"Gross_USDPP"<-table_MTW$"ER"*table_MTW$"Gross_USDPP"/100
