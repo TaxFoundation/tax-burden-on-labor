@@ -115,7 +115,7 @@ oecd_countries<-c("AUS",
 iso_codes <- read.csv("source-data/iso_country_codes.csv")
 colnames(iso_codes)<-c("Label","ISO2","Country")
 
-#Table 2: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2020####
+#Table 2: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2021####
 #144 Average tax wedge (% labour costs); 1441 Income tax as % of labour costs; 1442   Employee SSC as % of labour costs;1443 Average rate of employer's social security contributions (% gross wage earnings)###
 
 data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2021)
@@ -219,6 +219,23 @@ Figure1$dollar<-Figure1$percent/100*Figure1_data["32","Total Average Annual Labo
 
 write.csv(Figure1,"final-outputs/Figure1.csv",row.names = F)
 
+#Figure 1, but just for the US
+Figure1_data_US <- table1
+Figure1_data_US <- subset.data.frame (Figure1_data_US, Figure1_data_US$"Country" =="United States")
+
+print(colnames(Figure1_data))
+
+variable<-c("After-Tax Income","Income Tax", "Employee Payroll Taxes", "Employer Payroll Taxes","Pre-tax")
+percent<-c(100-Figure1_data_US["39","Tax Wedge in % (As a Share of Labor Cost)"],
+           Figure1_data_US["39","Income Tax in %"],
+           Figure1_data_US["39","Employee Payroll Taxes in %"],
+           Figure1_data_US["39","Employer Payroll Taxes in %"],
+           100)
+Figure1_US<-data.frame(variable,percent)
+Figure1_US$dollar<-Figure1_US$percent/100*Figure1_data_US["39","Total Average Annual Labor Cost per Employee in $"]
+
+write.csv(Figure1_US,"final-outputs/Figure1_US.csv",row.names = F)
+
 
 #Figure 2 Tax Burden in OECD Countries.Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage####
 Figure2 <- subset (data, subset = INDICATOR == 144)
@@ -262,13 +279,17 @@ write.csv(Figure3, "final-outputs/Figure3.csv",row.names = F)
 
 #Figure 4 OECD Average Tax Burden, 2000-2020. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage####
 Figure4<-get_dataset ("AWCOU",filter= list(c("144"),c("SINGLE2"), c("OAVG")), start_time = 2000)
+Figure4_US<-get_dataset ("AWCOU",filter= list(c("144"),c("SINGLE2"), c("USA")), start_time = 2000)
 
 #Drop redundant columns
-Figure4 <- subset(Figure4, select=-c(INDICATOR, FAM_TYPE, COU, TIME_FORMAT, POWERCODE))
+Figure4 <- subset(Figure4, select=-c(INDICATOR, FAM_TYPE,  TIME_FORMAT, POWERCODE))
+Figure4_US <- subset(Figure4_US, select=-c(INDICATOR, FAM_TYPE,  TIME_FORMAT, POWERCODE))
+
+Figure4<-merge(Figure4,Figure4_US,by=c("Time"))
+Figure4<-Figure4[,-c(2,4,6)]
 
 #Rename columns
-colnames(Figure4)[colnames(Figure4)=="Time"] <- "Year"
-colnames(Figure4)[colnames(Figure4)=="ObsValue"] <- "OECD Average"
+colnames(Figure4)<-c("Year","OECD","USA")
 
 write.csv(Figure4, "final-outputs/Figure4.csv",row.names = F)
 
