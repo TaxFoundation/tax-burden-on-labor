@@ -39,11 +39,11 @@ Location of **output tables and figures ** that are included in the publication.
 
 - `Figure4.csv` Table showing the OECD Average Tax Burden, 2000-2022. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage.
 
-- `Figure5.csv` Table showing the Most Notable Changes in the Tax Wedge between 2000 and 2021. Percentage-Point Difference between 2000 and 2019 in the Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage .
+- `Figure5.csv` Table showing the Most Notable Changes in the Tax Wedge between 2000 and 2022. Percentage-Point Difference between 2000 and 2022 in the Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage .
 
-- `Figure6.csv` [Not in 2021 version of report] Table showing the Economic Cost for the Marginal Dollar of Revenue Collected from Labor calculated as the Ratio of Marginal Tax Wedge to Average Tax Wedge, 2022
+- `Figure6.csv` Table comparing the Tax Burden Accounting for VAT in OECD Countries. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2022.
 
-- `Figure7.csv` Table comparing the Tax Burden Accounting for VAT in OECD Countries. Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2022.
+- `Figure7.csv` [Not in 2023 version of report] Table showing the Economic Cost for the Marginal Dollar of Revenue Collected from Labor calculated as the Ratio of Marginal Tax Wedge to Average Tax Wedge, 2022
 
 - `Table1.csv` Table comparing the Tax Wedge and it's decomposition of a Single Worker with no Children Earning a Nation's Average Wage, in the OECD Countries, 2022.
 
