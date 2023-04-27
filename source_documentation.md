@@ -12,7 +12,7 @@ Taxing Wages - Country tables, current model (https://stats.oecd.org/index.aspx?
 
 ### **SOURCE:**
 
-The VAT rates and the VAT revenue ratio (VRR) used in this publication are from the OECD’s “What drives consumption tax revenues? Disentangling policy and macroeconomic drivers” taxation working papers (https://doi.org/10.1787/94ed8187-en)
+The VAT rates and the VAT revenue ratio (VRR) used in this publication are from the OECD’s “Consumption Tax Trends 2022: VAT/GST and Excise, Core Design Features and Trends” (https://doi.org/10.1787/6525a942-en)
 
 ## **COUNTRY CODES**
 
