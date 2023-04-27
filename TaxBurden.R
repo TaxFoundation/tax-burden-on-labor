@@ -115,11 +115,11 @@ oecd_countries<-c("AUS",
 iso_codes <- read.csv("source-data/iso_country_codes.csv")
 colnames(iso_codes)<-c("Label","ISO2","Country")
 
-#Table 2: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2021####
+#Table 2: Tax Wedge of a Single Worker with no Children Earning a Nation's Average Wage, 2022####
 #144 Average tax wedge (% labour costs); 1441 Income tax as % of labour costs; 1442   Employee SSC as % of labour costs;1443 Average rate of employer's social security contributions (% gross wage earnings)###
 
-data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2021)
-data_labourcost<-get_dataset("AWCOMP",filter= list(c("5_1","5_2","5_3"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2021)
+data <-get_dataset("AWCOU",filter= list(c("144","1441","1442","1443"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2022)
+data_labourcost<-get_dataset("AWCOMP",filter= list(c("5_1","5_2","5_3"),c("SINGLE2"),c(oecd_countries,"OAVG")),start_time = 2022)
 
 #Save Gross Earnings in USDPP for MTW
 Gross_Earnings_USDPP <-  subset(data_labourcost, INDICATOR == "5_1")
@@ -254,9 +254,9 @@ colnames(Figure2)[colnames(Figure2)=="Label"] <- "Country"
 
 write.csv(Figure2, "final-outputs/Figure2.csv",row.names = F)
 
-#Figure 3  Tax Burden of Singles vs. Families. Tax Wedges at a Nation's Average Wage, 2021####
+#Figure 3  Tax Burden of Singles vs. Families. Tax Wedges at a Nation's Average Wage, 2022####
 
-Figure3<-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2","MARRIED1")),start_time = 2021)
+Figure3<-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2","MARRIED1")),start_time = 2022)
 
 #Drop redundant columns
 Figure3 <- subset(Figure3, select=-c(INDICATOR, TIME_FORMAT, UNIT, POWERCODE, Time))
@@ -296,7 +296,7 @@ write.csv(Figure4, "final-outputs/Figure4.csv",row.names = F)
 
 #Figure 5 Most Notable Changes in the Tax Wedge between 2000 and 2020####
 
-Figure5 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2021)
+Figure5 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2022)
 
 Figure5_2000 <-get_dataset("AWCOU",filter= list(c("144"),c("SINGLE2")),start_time = 2000, end_time = 2000)
 
@@ -312,9 +312,9 @@ Figure5 <- spread (Figure5, key = Time, value = ObsValue)
 
 #Determine the 6 countries with the Most Notable Changes in the Tax Wedge between 2000 and 2020
 Figure5$`2000`<-as.numeric(Figure5$`2000`)
-Figure5$`2021`<-as.numeric(Figure5$`2021`)
+Figure5$`2022`<-as.numeric(Figure5$`2022`)
 
-Figure5$dif <- Figure5$'2021'- Figure5$'2000'
+Figure5$dif <- Figure5$'2022'- Figure5$'2000'
 Figure5$abs <- abs(Figure5$dif)
 Figure5$Rank <- rank (Figure5$abs)
 Figure5 <- subset(Figure5, Figure5$Rank > 32)
@@ -324,9 +324,9 @@ Figure5 <- subset (Figure5, select=-c(2,3,abs, Rank))
 
 #Rename columns
 colnames(Figure5)[colnames(Figure5)=="COU"] <- "Country"
-colnames(Figure5)[colnames(Figure5)=="dif"] <- "Change in Tax Wedge between 2000 and 2021"
+colnames(Figure5)[colnames(Figure5)=="dif"] <- "Change in Tax Wedge between 2000 and 2022"
 
-Figure5 [order(Figure5$"Change in Tax Wedge between 2000 and 2021"),]
+Figure5 [order(Figure5$"Change in Tax Wedge between 2000 and 2022"),]
 
 Figure5<-merge(iso_codes,Figure5,by=c("Country"))
 Figure5<-Figure5[,-c(1,3)]
@@ -447,7 +447,9 @@ write.csv(figure6, "final-outputs/figure6.csv",row.names = F)
 
 
 #Marginal Tax Wedges for country profile page charts####
-data_MTW <-get_dataset("TXWDECOMP",filter= list(c(oecd_countries, "OAVG"),c("MRG_TX_WEDGE"),c("SGL"), c("50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150")),start_time = 2021)
+
+#data_MTW <-get_dataset("TXWDECOMP",filter= list(c(oecd_countries,"OAVG"),c("MRG_TX_WEDGE"),c("SGL"), c("50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150")),start_time = 2022)
+data_MTW <-get_dataset("TXWDECOMP",filter= list(c(oecd_countries),c("MRG_TX_WEDGE"),c("SGL"), c("50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150")),start_time = 2022)
 table_MTW <- data_MTW[c(1,2,5)]
 
 #Merge MTW with Average Gross Earnings in USDPP
@@ -462,7 +464,7 @@ table_MTW$"Gross_USDPP"<-table_MTW$"ER"*table_MTW$"Gross_USDPP"/100
 table_MTW$Gross_USDPP<-round(table_MTW$Gross_USDPP,-2)
 
 #rename columns
-colnames(table_MTW)[colnames(table_MTW)=="obsValue"] <- "Marginal Tax Wedge"
+colnames(table_MTW)[colnames(table_MTW)=="ObsValue"] <- "Marginal Tax Wedge"
 colnames(table_MTW)[colnames(table_MTW)=="ER"] <- "% of Total Earnings"
 colnames(table_MTW)[colnames(table_MTW)=="Gross_USDPP"] <- "Annual Gross Wage in US Dollars"
 
